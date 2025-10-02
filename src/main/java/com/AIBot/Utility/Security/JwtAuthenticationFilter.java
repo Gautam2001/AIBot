@@ -1,7 +1,11 @@
 package com.AIBot.Utility.Security;
 
 import java.io.IOException;
+import java.util.Collections;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.AIBot.Utility.CommonUtils;
@@ -32,8 +36,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             try {
                 Claims claims = jwtUtil.validateToken(token);
-                // You can log claims if needed:
                 CommonUtils.logMethodEntry(this, "Token valid for: " + claims.getSubject());
+
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                    Authentication auth = new UsernamePasswordAuthenticationToken(
+                            claims.getSubject(),
+                            null,
+                            Collections.emptyList()
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+
             } catch (ExpiredJwtException ex) {
                 sendError(response, "Token expired", 498);
                 return;
