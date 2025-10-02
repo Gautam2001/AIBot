@@ -29,7 +29,7 @@ public class SecurityConfig {
 		return http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						.requestMatchers("/bot/ping")
-						.permitAll().anyRequest().permitAll())
+						.permitAll().anyRequest().authenticated())
 				.exceptionHandling(e -> e.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
 						.accessDeniedHandler(new CustomAccessDeniedHandler()))
 				.addFilterBefore(new JwtAuthenticationFilter(jwtUtil),
